@@ -15,7 +15,7 @@ int main() {
     int N, M;
     
     cin >> N >> M;
-
+ 
     for (int i = 1; i <= N; i++) {
         int temp;
         cin >> temp;
