@@ -43,7 +43,9 @@ int main() {
     return 0;
 }
 
-bool inRange(int r, int c) {
+// inline 그냥 코드 바로 붙이는거임. 함수 칸 새로 안 열게 됨. 그냥 원래 함수 칸 안에 넣어버림.
+
+inline bool inRange(int r, int c) {
     return 0 <= r  && r < 8 && 0 <= c && c < 8;
 }
 
