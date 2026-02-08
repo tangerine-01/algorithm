@@ -6,10 +6,10 @@
 using namespace std;
 
 bool kuung();
-int isS();
-int isBull();
-int ariFront();
-int ariTurn(int i);
+bool isS();
+bool isBull();
+void ariFront();
+void ariTurn(int i);
 inline bool inRange(int r, int c);
 
 int dx[4] = {0, -1, 0, 1};
@@ -137,10 +137,23 @@ int main() {
     }
     
     for (int i = 0; i < A.size(); i++) {
-        for (Zombi &z:zombis) z.move();
+
         if (A[i] == 'F') ariFront();
         else ariTurn(i);
+
+        if (kuung()) {
+            cout << "Aaaaaah!";
+            return 0;
+        }
+
+        for (Zombi &z : zombis) z.move();
+
+        if (kuung()) {
+            cout << "Aaaaaah!";
+            return 0;
+        }
     }
+
 
     if (!isKuung) cout << "Phew...";
 
@@ -148,63 +161,76 @@ int main() {
 }
 
 bool kuung() {
-    for (Zombi &z:zombis) {
-        if ((z.x == ari.x && z.y == ari.y)){
-            isKuung = true;
+    for (Zombi &z : zombis) {
+        if (z.x == ari.x && z.y == ari.y) {
+            if (!isBull() && !isS()) {
+                isKuung = true;
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+
+bool isS() {
+    for (S &s : ss) {
+        if (s.x == ari.x && s.y == ari.y) {
+
+            for (int dx = -1; dx <= 1; dx++) {
+                for (int dy = -1; dy <= 1; dy++) {
+                    int r = s.x + dx;
+                    int c = s.y + dy;
+                    if (!inRange(r, c)) continue;
+
+                    bool exists = false;
+                    for (Bull &b : bulls) {
+                        if (b.x == r && b.y == c) {
+                            exists = true;
+                            break;
+                        }
+                    }
+                    if (!exists) bulls.push_back(Bull(r, c));
+                }
+            }
             return true;
         }
     }
     return false;
 }
 
-int isS() {
-    for (S &s:ss) {
-        if ((s.x == ari.x && s.y == ari.y)) {
-            Bull a(s.x, s.y); bulls.push_back(a);
-            Bull b(s.x + 1, s.y); bulls.push_back(b);
-            Bull c(s.x, s.y + 1); bulls.push_back(c);
-            Bull d(s.x - 1, s.y); bulls.push_back(d);
-            Bull e(s.x, s.y - 1); bulls.push_back(e);
-            return 1;
-        }
-        else return 0;
-    }
-    return 0;
-}
 
-int isBull() {
+bool isBull() {
     for (Bull &bull:bulls) {
-        if (!(bull.x == ari.x && bull.y == ari.y)) continue;
-        return 0;
+        if (bull.x == ari.x && bull.y == ari.y) return true; 
     }
-    return 1;
+    return false;
 }
 
-int ariFront() {
-    if (!isS()) {
-        if (!isBull()) {
-            ari.front();
-            if (!isBull()) return 1;
-            if (kuung()) cout << "Aaaaaah!";
-            return 1;
-        }
-        if (kuung()) cout << "Aaaaaah!";
-        return 1;
+void ariFront() {
+    int r = ari.x + dx[ari.direction];
+    int c = ari.y + dy[ari.direction];
+
+    if (!inRange(r, c)) return;
+
+    ari.x = r;
+    ari.y = c;
+
+    if (kuung()) {
+        cout << "Aaaaaah!";
+        exit(0);
     }
-    return 0;
+
+    isS();
 }
 
-int ariTurn(int i) {
-    if (A[i] == 'R' && A[i] == 'L') {
-        if (isBull()) {
-            ari.turn(A[i]);
-            return 0;
-        }
-        if (kuung()) cout << "Aaaaaah!";
-        ari.turn(A[i]);
-        return 0;
+void ariTurn(int i) {
+    ari.turn(A[i]);
+
+    if (kuung()) {
+        cout << "Aaaaaah!";
+        return ;
     }
-    return -1;
 }
 
 inline bool inRange(int r, int c) {
